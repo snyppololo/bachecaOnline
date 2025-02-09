@@ -22,7 +22,60 @@ public class Annuncio {
 
     public Annuncio() {}
 
+    //SETTERS
+    public void setIdAnnuncio(int idAnnuncio) {
+        this.idAnnuncio = idAnnuncio;
+    }
+
+    public void setUtente(String utente) {
+        this.utente = utente;
+    }
+
+    public void setTitolo(String titolo) {
+        this.titolo = titolo;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public void setDataPubblicazione(Date dataPubblicazione) {
+        this.dataPubblicazione = dataPubblicazione;
+    }
+    public void setDataVendita(Date dataVendita) {
+        this.dataVendita = dataVendita;
+    }
+
+    //GETTERS
     public int getIdAnnuncio() {
         return idAnnuncio;
+    }
+
+    public String getUtente() {
+        return utente;
+    }
+
+    public String getTitolo() {
+        return titolo;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public Date getDataPubblicazione() {
+        return dataPubblicazione;
+    }
+
+    public Date getDataVendita() {
+        return dataVendita;
     }
 }

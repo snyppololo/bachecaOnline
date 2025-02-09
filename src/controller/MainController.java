@@ -1,6 +1,7 @@
 package controller;
 
 import utils.Credentials;
+import utils.LoggedUser;
 
 public class MainController implements Controller {
     Credentials cred;
@@ -15,11 +16,11 @@ public class MainController implements Controller {
             throw new RuntimeException("Invalid credentials");
         }
 
-        System.out.println(cred.getUsername());
-        System.out.println(cred.getPassword());
-        System.out.println(cred.getRole());
+        LoggedUser.setUsername(cred.getUsername());
+        LoggedUser.setPassword(cred.getPassword());
+        LoggedUser.setRole(cred.getRole());
 
-        switch(cred.getRole()) {
+        switch(LoggedUser.getRole()) {
             case user -> new UserController().start();
             case admin -> new AdminController().start();
             default -> throw new RuntimeException("Invalid credentials");

@@ -10,18 +10,25 @@ import java.sql.SQLException;
 public class CreaAnnuncioDAO implements GenericProcedureDAO<String> {
     @Override
     public String execute(Object... params){
+        Annuncio annuncio = (Annuncio) params[0];
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            CallableStatement cs = getCallableStatement(annuncio);
+            cs.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return "Annuncio creato con successo";
 
     }
 
-    private static CallableStatement getCallableStatement(Lesson lsn) throws SQLException {
+    private static CallableStatement getCallableStatement(Annuncio ann) throws SQLException {
         Connection conn = ConnectionFactory.getConnection();
-        CallableStatement cs = conn.prepareCall("{call creaAnnuncio(?,?,?,?,?)}");
-        cs.setString(1, lsn.getCourse());
-        cs.setString(2, lsn.getCommaDays());
-        cs.setTime(3, lsn.getStartAt());
-        cs.setTime(4, lsn.getEndAt());
-        cs.setString(5, lsn.getTub());
-
+        CallableStatement cs = conn.prepareCall("{call creaAnnuncio(?,?,?,?)}");
+        cs.setString(1, ann.getUtente());
+        cs.setString(2, ann.getTitolo());
+        cs.setString(3, ann.getDescrizione());
+        cs.setString(4, ann.getCategoria());
         return cs;
     }
 }

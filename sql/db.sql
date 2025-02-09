@@ -218,7 +218,7 @@ DROP procedure IF EXISTS `bacheca_online`.`creaAnnuncio`;
 
 DELIMITER $$
 USE `bacheca_online`$$
-CREATE PROCEDURE `creaAnnuncio` (in var_utente VARCHAR(45), in var_titolo VARCHAR(45), in var_descrizione VARCHAR(300), in var_categoria VARCHAR(45) , in data_pubblicazione DATE)
+CREATE PROCEDURE `creaAnnuncio` (in var_utente VARCHAR(45), in var_titolo VARCHAR(45), in var_descrizione VARCHAR(300), in var_categoria VARCHAR(45))
 BEGIN
 	INSERT INTO annuncio(utente, titolo, descrizione, categoria, data_pubblicazione) VALUES (var_utente, var_titolo, var_descrizione, var_categoria, curdate());
 END$$
@@ -509,6 +509,24 @@ END$$
 DELIMITER ;
 USE `bacheca_online`;
 
+-- -----------------------------------------------------
+-- procedure getCategories
+-- -----------------------------------------------------
+
+USE `bacheca_online`;
+DROP procedure IF EXISTS `bacheca_online`.`getCategories`;
+
+DELIMITER $$
+USE `bacheca_online`$$
+CREATE PROCEDURE `getCategories` ()
+BEGIN
+	SELECT nome_categoria, categoria_superiore
+    FROM categoria;
+END$$
+
+DELIMITER ;
+USE `bacheca_online`;
+
 DELIMITER $$
 
 USE `bacheca_online`$$
@@ -564,6 +582,8 @@ GRANT EXECUTE ON procedure `bacheca_online`.`listaAnnunciNotificheAttive` TO 'ba
 GRANT EXECUTE ON procedure `bacheca_online`.`listaAnnunciPubblicatiUtente` TO 'ba_user';
 GRANT EXECUTE ON procedure `bacheca_online`.`scriviMessaggio` TO 'ba_user';
 GRANT EXECUTE ON procedure `bacheca_online`.`pubblicaCommento` TO 'ba_user';
+GRANT EXECUTE ON procedure `bacheca_online`.`getCategories` TO 'ba_user';
+
 SET SQL_MODE = '';
 DROP USER IF EXISTS ba_admin;
 SET SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -572,6 +592,7 @@ CREATE USER 'ba_admin' IDENTIFIED BY 'ba_admin';
 GRANT EXECUTE ON procedure `bacheca_online`.`reportPercentualeAnnunciVendutiUtente` TO 'ba_admin';
 GRANT EXECUTE ON procedure `bacheca_online`.`registraUtente` TO 'ba_admin';
 GRANT EXECUTE ON procedure `bacheca_online`.`inserisciMetodiDiContatto` TO 'ba_admin';
+GRANT EXECUTE ON procedure `bacheca_online`.`getCategories` TO 'ba_admin';
 
 START TRANSACTION;
 USE bacheca_online;
