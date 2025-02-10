@@ -525,6 +525,51 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- -----------------------------------------------------
+-- procedure disattivaNotifichePerAnnuncio
+-- -----------------------------------------------------
+
+USE `bacheca_online`;
+DROP procedure IF EXISTS `bacheca_online`.`disattivaNotifichePerAnnuncio`;
+
+DELIMITER $$
+USE `bacheca_online`$$
+CREATE PROCEDURE `disattivaNotifichePerAnnuncio` (in var_utente VARCHAR(45), in var_annuncio int)
+BEGIN
+	DELETE FROM attiva_notifica
+    WHERE utente=var_utente AND annuncio = var_annuncio;
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- procedure checkNotificheOn
+-- -----------------------------------------------------
+
+USE `bacheca_online`;
+DROP procedure IF EXISTS `bacheca_online`.`checkNotificheOn`;
+
+DELIMITER $$
+USE `bacheca_online`$$
+CREATE PROCEDURE `checkNotificheOn` (in var_utente VARCHAR(45), in var_annuncio int, out var_attiva BOOLEAN)
+BEGIN
+	DECLARE var_res int;
+    
+    SELECT COUNT(*) INTO var_res
+    FROM attiva_notifica 
+    WHERE utente=var_utente AND annuncio=var_annuncio;
+    
+    IF var_res > 0 THEN
+		SET var_attiva = TRUE;
+	else
+		SET var_attiva = FALSE;
+	end if;
+    
+END$$
+
+DELIMITER ;
+
 USE `bacheca_online`;
 
 DELIMITER $$
@@ -583,6 +628,8 @@ GRANT EXECUTE ON procedure `bacheca_online`.`listaAnnunciPubblicatiUtente` TO 'b
 GRANT EXECUTE ON procedure `bacheca_online`.`scriviMessaggio` TO 'ba_user';
 GRANT EXECUTE ON procedure `bacheca_online`.`pubblicaCommento` TO 'ba_user';
 GRANT EXECUTE ON procedure `bacheca_online`.`getCategories` TO 'ba_user';
+GRANT EXECUTE ON procedure `bacheca_online`.`disattivaNotifichePerAnnuncio` TO 'ba_user';
+GRANT EXECUTE ON procedure `bacheca_online`.`checkNotificheOn` TO 'ba_user';
 
 SET SQL_MODE = '';
 DROP USER IF EXISTS ba_admin;

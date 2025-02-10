@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Scanner;
 
 public class UserView {
 
@@ -64,7 +63,7 @@ public class UserView {
         }
     }
 
-    public static int showTitoliAnnunciAttivi(List<Annuncio> annunci) throws IOException {
+    public static int showTitoliAnnunci(List<Annuncio> annunci) throws IOException {
         System.out.println("\n--- Annunci attivi ---");
         System.out.println("Seleziona un annuncio per visualizzarne le informazioni complete");
         for (int i = 0; i < annunci.size(); i++) {
@@ -80,12 +79,15 @@ public class UserView {
         }
     }
 
-    public static int showAnnuncioDetails(Annuncio annuncio) throws IOException {
-        System.out.println("\n");
+    public static void showAnnuncioDetails(Annuncio annuncio) throws IOException {
         System.out.println(annuncio);
-        System.out.println("1) Scrivi un messaggio privato al venditore");
+    }
+
+    public static int showAnnuncioOptions(boolean notificheAttive) throws IOException {
+        String onOrOff = !notificheAttive ? "Attiva" : "Disattiva";
+        System.out.println("\n1) Scrivi un messaggio privato al venditore");
         System.out.println("2) Pubblica un commento");
-        System.out.println("3) Attiva le notifiche per questo annuncio");
+        System.out.println("3) "+onOrOff+" le notifiche per questo annuncio");
         printBackOption(4);
         return getAndValidateInput(4);
     }
@@ -106,6 +108,7 @@ public class UserView {
     private static void printBackOption(int optionNumber){
         System.out.println(optionNumber+") Torna indietro");
     }
+
 
 
 }

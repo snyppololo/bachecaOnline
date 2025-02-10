@@ -83,7 +83,7 @@ public class Annuncio {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         String dataVenditaString = this.dataVendita == null ? "---" : this.dataVendita.toString();
-        sb
+        sb.append("\n")
                 .append("ID: ").append(idAnnuncio).append("\n")
                 .append("Venditore: ").append(utente).append("\n")
                 .append("Titolo: ").append(titolo).append("\n")

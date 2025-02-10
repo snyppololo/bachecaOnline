@@ -1,12 +1,11 @@
 package controller;
 
-import dao.CreaAnnuncioDAO;
-import dao.GetCategoriesDAO;
-import dao.ListaAnnunciAttiviDAO;
+import dao.*;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Annuncio;
 import model.Categoria;
+import utils.LoggedUser;
 import utils.Role;
 import view.UserView;
 
@@ -63,19 +62,23 @@ public class UserController implements Controller{
         try{
             //Mostro inizialmente all'utente solo i titoli degli annunci attivi
             List<Annuncio> annunci = new ListaAnnunciAttiviDAO().execute();
-            annuncioIndex = UserView.showTitoliAnnunciAttivi(annunci);
+            annuncioIndex = UserView.showTitoliAnnunci(annunci);
 
             if (annuncioIndex == GO_BACK){
                 mainMenuStart();
             }
 
             //Ora mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
-            choice = UserView.showAnnuncioDetails(annunci.get(annuncioIndex));
+            UserView.showAnnuncioDetails(annunci.get(annuncioIndex));
+
+            //Prima di mostrare le scelte devo controllare se l'utente ha gia' le notifiche attive per l'annuncio (Opzione attiva/disattiva notifiche)
+            boolean notificheOn = new CheckNotificheOnDAO().execute(annunci.get(annuncioIndex));
+            choice = UserView.showAnnuncioOptions(notificheOn);
 
             switch (choice){
                 case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
                 case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
-                case 3 -> attivaNotifiche(annunci.get(annuncioIndex));
+                case 3 -> switchNotifiche(annunci.get(annuncioIndex), notificheOn);
                 case 4 -> visualizzaAnnunciAttivi();
             }
 
@@ -92,14 +95,44 @@ public class UserController implements Controller{
         throw new RuntimeException();
     }
 
-    private void attivaNotifiche(Annuncio annuncio) {
-        throw new RuntimeException();
+    private void switchNotifiche(Annuncio annuncio, boolean notificheAttive) {
+        if (notificheAttive){
+            System.out.println(new DisattivaNotificheDAO().execute(annuncio));
+        }else{
+            System.out.println(new AttivaNotificheDAO().execute(annuncio));
+        }
     }
 
 
     //CASE 3 dello switch case
     private void visualizzaAnnunciPreferiti() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int choice;
+        int annuncioIndex;
+        try{
+            //Mostro inizialmente all'utente solo i titoli degli annunci attivi
+            List<Annuncio> annunci = new ListaAnnunciNotificheAttiveDAO().execute();
+            annuncioIndex = UserView.showTitoliAnnunci(annunci);
+
+            if (annuncioIndex == GO_BACK){
+                mainMenuStart();
+            }
+
+            //Ora mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
+            UserView.showAnnuncioDetails(annunci.get(annuncioIndex));
+
+            //boolean notificheOn = new CheckNotificheOnDAO().execute(LoggedUser.getUsername(), annunci.get(annuncioIndex).getIdAnnuncio());
+            choice = UserView.showAnnuncioOptions(true);
+
+            switch (choice){
+                case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
+                case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
+                case 3 -> switchNotifiche(annunci.get(annuncioIndex), true);
+                case 4 -> visualizzaAnnunciPreferiti();
+            }
+
+        }catch (IOException | DAOException | SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 
     //CASE 4 dello switch case
@@ -129,10 +162,6 @@ public class UserController implements Controller{
 
         //STEP 3: Esecuzione della procedura
         System.out.println(new CreaAnnuncioDAO().execute(ann));
-
-
-
-
     }
 
     private String selectCategory() {
