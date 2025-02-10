@@ -22,6 +22,6 @@ public class DisattivaNotificheDAO implements GenericProcedureDAO<String>{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return "Notifiche disattivate con successo\n";
+        return "Notifiche disattivate con successo";
     }
 }

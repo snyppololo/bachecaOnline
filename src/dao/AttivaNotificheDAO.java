@@ -21,6 +21,6 @@ public class AttivaNotificheDAO implements GenericProcedureDAO<String>{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return "Notifiche attivate con successo\n";
+        return "Notifiche attivate con successo";
     }
 }

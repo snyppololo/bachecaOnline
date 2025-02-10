@@ -301,7 +301,7 @@ DELIMITER $$
 USE `bacheca_online`$$
 CREATE PROCEDURE `listaAnnunciNotificheAttive` (in var_utente VARCHAR(45))
 BEGIN
-	SELECT A.id_annuncio, A.utente, A.titolo, A.descrizione, A.categoria, A.data_pubblicazione
+	SELECT A.id_annuncio, A.utente, A.titolo, A.descrizione, A.categoria, A.data_pubblicazione, A.data_vendita
     FROM attiva_notifica as AN
     JOIN annuncio as A ON AN.annuncio = A.id_annuncio
     WHERE AN.utente = var_utente
@@ -379,7 +379,7 @@ USE `bacheca_online`$$
 CREATE PROCEDURE `listaAnnunciAttivi` ()
 BEGIN
 	
-	SELECT id_annuncio, utente, titolo, descrizione, categoria, data_pubblicazione 
+	SELECT id_annuncio, utente, titolo, descrizione, categoria, data_pubblicazione, data_vendita
     FROM annuncio
     WHERE data_vendita IS NULL
     ORDER BY data_pubblicazione DESC;

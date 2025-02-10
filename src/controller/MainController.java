@@ -13,7 +13,7 @@ public class MainController implements Controller {
         cred = loginController.getCred();
 
         if(cred.getRole() == null) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Credenziali errate");
         }
 
         LoggedUser.setUsername(cred.getUsername());
@@ -23,7 +23,7 @@ public class MainController implements Controller {
         switch(LoggedUser.getRole()) {
             case user -> new UserController().start();
             case admin -> new AdminController().start();
-            default -> throw new RuntimeException("Invalid credentials");
+            default -> throw new RuntimeException("Credenziali errate");
         }
     }
 }

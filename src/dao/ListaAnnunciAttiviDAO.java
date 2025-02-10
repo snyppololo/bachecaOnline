@@ -28,6 +28,7 @@ public class ListaAnnunciAttiviDAO implements GenericProcedureDAO<List<Annuncio>
                 ann.setDescrizione(rs.getString("descrizione"));
                 ann.setCategoria(rs.getString("categoria"));
                 ann.setDataPubblicazione(rs.getDate("data_pubblicazione"));
+                ann.setDataVendita(rs.getDate("data_vendita"));
                 annunci.add(ann);
             }
         } catch(SQLException e) {

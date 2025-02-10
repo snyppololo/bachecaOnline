@@ -1,11 +1,11 @@
 package controller;
 
 import dao.*;
+import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Annuncio;
 import model.Categoria;
-import utils.LoggedUser;
 import utils.Role;
 import view.UserView;
 
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserController implements Controller{
+public class UserController implements Controller {
 
     //hashmap con chiave = Categoria padre - valore = lista categorie figlie
     private static final Map<String, List<String>> categoriePadreToFiglio = new HashMap<>();
@@ -27,28 +27,28 @@ public class UserController implements Controller{
     public void start() {
         try {
             ConnectionFactory.changeRole(Role.user);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         mainMenuStart();
     }
 
     private void mainMenuStart() {
-        while (true){
+        while (true) {
             int choice;
             try {
                 choice = UserView.showMenu();
-                switch (choice){
+                switch (choice) {
                     case 1 -> creaAnnuncio();
                     case 2 -> visualizzaAnnunciAttivi();
                     case 3 -> visualizzaAnnunciPreferiti();
-                    case 4 -> visualizzaTuoiAnnunci();
+                    case 4 -> visualizzaMieiAnnunci();
                     case 5 -> {
                         ConnectionFactory.closeConnection();
                         System.exit(0);
                     }
                 }
-            }catch (IOException | DAOException | SQLException e){
+            } catch (IOException | DAOException | SQLException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -59,12 +59,12 @@ public class UserController implements Controller{
         //throw new UnsupportedOperationException("Not supported yet.");
         int choice;
         int annuncioIndex;
-        try{
+        try {
             //Mostro inizialmente all'utente solo i titoli degli annunci attivi
             List<Annuncio> annunci = new ListaAnnunciAttiviDAO().execute();
             annuncioIndex = UserView.showTitoliAnnunci(annunci);
 
-            if (annuncioIndex == GO_BACK){
+            if (annuncioIndex == GO_BACK) {
                 mainMenuStart();
             }
 
@@ -75,14 +75,14 @@ public class UserController implements Controller{
             boolean notificheOn = new CheckNotificheOnDAO().execute(annunci.get(annuncioIndex));
             choice = UserView.showAnnuncioOptions(notificheOn);
 
-            switch (choice){
+            switch (choice) {
                 case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
                 case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
                 case 3 -> switchNotifiche(annunci.get(annuncioIndex), notificheOn);
                 case 4 -> visualizzaAnnunciAttivi();
             }
 
-        }catch (IOException | DAOException | SQLException e){
+        } catch (IOException | DAOException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -96,9 +96,9 @@ public class UserController implements Controller{
     }
 
     private void switchNotifiche(Annuncio annuncio, boolean notificheAttive) {
-        if (notificheAttive){
+        if (notificheAttive) {
             System.out.println(new DisattivaNotificheDAO().execute(annuncio));
-        }else{
+        } else {
             System.out.println(new AttivaNotificheDAO().execute(annuncio));
         }
     }
@@ -108,12 +108,12 @@ public class UserController implements Controller{
     private void visualizzaAnnunciPreferiti() {
         int choice;
         int annuncioIndex;
-        try{
+        try {
             //Mostro inizialmente all'utente solo i titoli degli annunci attivi
             List<Annuncio> annunci = new ListaAnnunciNotificheAttiveDAO().execute();
             annuncioIndex = UserView.showTitoliAnnunci(annunci);
 
-            if (annuncioIndex == GO_BACK){
+            if (annuncioIndex == GO_BACK) {
                 mainMenuStart();
             }
 
@@ -123,40 +123,71 @@ public class UserController implements Controller{
             //boolean notificheOn = new CheckNotificheOnDAO().execute(LoggedUser.getUsername(), annunci.get(annuncioIndex).getIdAnnuncio());
             choice = UserView.showAnnuncioOptions(true);
 
-            switch (choice){
+            switch (choice) {
                 case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
                 case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
                 case 3 -> switchNotifiche(annunci.get(annuncioIndex), true);
                 case 4 -> visualizzaAnnunciPreferiti();
             }
 
-        }catch (IOException | DAOException | SQLException e){
+        } catch (IOException | DAOException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     //CASE 4 dello switch case
-    private void visualizzaTuoiAnnunci() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private void visualizzaMieiAnnunci() {
+        int choice;
+        int annuncioIndex;
+        try {
+            //Mostro inizialmente all'utente solo i titoli degli annunci attivi
+            List<Annuncio> annunci = new ListaAnnunciPubblicatiDAO().execute();
+            annuncioIndex = UserView.showTitoliAnnunci(annunci);
+
+            if (annuncioIndex == GO_BACK) {
+                mainMenuStart();
+            }
+
+            Annuncio myAnnuncio = annunci.get(annuncioIndex);
+
+            //Ora mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
+            UserView.showAnnuncioDetails(myAnnuncio);
+
+            //boolean notificheOn = new CheckNotificheOnDAO().execute(LoggedUser.getUsername(), annunci.get(annuncioIndex).getIdAnnuncio());
+            choice = UserView.showMyAnnuncioOptions();
+
+            switch (choice) {
+                case 1 -> contrassegnaAnnuncioVenduto(myAnnuncio);
+                case 2 -> visualizzaMieiAnnunci();
+            }
+
+        } catch (IOException | DAOException | SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-
-
+    private void contrassegnaAnnuncioVenduto(Annuncio myAnnuncio) {
+        try {
+            System.out.println(new AnnuncioVendutoDAO().execute(myAnnuncio));
+        } catch (AnnuncioGiaVendutoException e){
+            System.out.println(e.getMessage());
+        }
+    }
 
 
     private void creaAnnuncio() throws DAOException, SQLException {
         //STEP 1: Selezione categoria
         String category = selectCategory();
-        if (category == null){
+        if (category == null) {
             mainMenuStart();
         }
-        System.out.println("Categoria scelta: "+category);
+        System.out.println("Categoria scelta: " + category);
 
         //STEP 2: Form per l'annuncio
         Annuncio ann;
-        try{
+        try {
             ann = UserView.annuncioForm(category);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 

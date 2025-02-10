@@ -13,10 +13,10 @@ public class UserView {
     private static final int GO_BACK = -1;
 
     public static int showMenu() throws IOException {
-        System.out.println("*********************************************");
+        System.out.println("\n*********************************************");
         System.out.println("*    BACHECA ONLINE DI ANNUNCI - USER       *");
         System.out.println("*********************************************\n");
-        System.out.println("************** Cosa vuoi fare? **************\n");
+        System.out.println("************** Cosa vuoi fare? **************");
         System.out.println("1) Crea un annuncio");
         System.out.println("2) Visualizza annunci attivi");
         System.out.println("3) Visualizza annunci preferiti");
@@ -47,7 +47,7 @@ public class UserView {
 
     public static int selezioneCategoria(List<String> categorie) throws IOException {
 
-        System.out.println("Seleziona una categoria:");
+        System.out.println("\nSeleziona una categoria:");
 
         for (int i = 0; i < categorie.size(); i++) {
             System.out.println(i+1+") "+categorie.get(i));
@@ -91,6 +91,13 @@ public class UserView {
         printBackOption(4);
         return getAndValidateInput(4);
     }
+
+    public static int showMyAnnuncioOptions() throws IOException {
+        System.out.println("\n1) Contrassegna annuncio come venduto");
+        printBackOption(2);
+        return getAndValidateInput(2);
+    }
+
 
     private static int getAndValidateInput(int maxNumber) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
