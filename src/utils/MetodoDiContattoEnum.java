@@ -1,5 +1,5 @@
 package utils;
 
-public enum MetodoDiContatto {
+public enum MetodoDiContattoEnum {
     email, telefono, cellulare
 }

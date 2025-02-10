@@ -2,6 +2,7 @@ package controller;
 
 import dao.CreaAnnuncioDAO;
 import dao.GetCategoriesDAO;
+import dao.ListaAnnunciAttiviDAO;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Annuncio;
@@ -21,6 +22,7 @@ public class UserController implements Controller{
     //hashmap con chiave = Categoria padre - valore = lista categorie figlie
     private static final Map<String, List<String>> categoriePadreToFiglio = new HashMap<>();
     private static final Map<String, String> categorieFiglioToPadre = new HashMap<>();
+    private static final int GO_BACK = -1;
 
     @Override
     public void start() {
@@ -29,7 +31,10 @@ public class UserController implements Controller{
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
+        mainMenuStart();
+    }
 
+    private void mainMenuStart() {
         while (true){
             int choice;
             try {
@@ -50,22 +55,69 @@ public class UserController implements Controller{
         }
     }
 
-    private void visualizzaTuoiAnnunci() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    //CASE 2 dello switch case
+    private void visualizzaAnnunciAttivi() {
+        //throw new UnsupportedOperationException("Not supported yet.");
+        int choice;
+        int annuncioIndex;
+        try{
+            //Mostro inizialmente all'utente solo i titoli degli annunci attivi
+            List<Annuncio> annunci = new ListaAnnunciAttiviDAO().execute();
+            annuncioIndex = UserView.showTitoliAnnunciAttivi(annunci);
+
+            if (annuncioIndex == GO_BACK){
+                mainMenuStart();
+            }
+
+            //Ora mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
+            choice = UserView.showAnnuncioDetails(annunci.get(annuncioIndex));
+
+            switch (choice){
+                case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
+                case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
+                case 3 -> attivaNotifiche(annunci.get(annuncioIndex));
+                case 4 -> visualizzaAnnunciAttivi();
+            }
+
+        }catch (IOException | DAOException | SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 
+    private void scriviMessaggio(Annuncio annuncio) {
+        throw new RuntimeException();
+    }
+
+    private void pubblicaCommento(Annuncio annuncio) {
+        throw new RuntimeException();
+    }
+
+    private void attivaNotifiche(Annuncio annuncio) {
+        throw new RuntimeException();
+    }
+
+
+    //CASE 3 dello switch case
     private void visualizzaAnnunciPreferiti() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private void visualizzaAnnunciAttivi() {
+    //CASE 4 dello switch case
+    private void visualizzaTuoiAnnunci() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+
+
+
 
     private void creaAnnuncio() throws DAOException, SQLException {
         //STEP 1: Selezione categoria
         String category = selectCategory();
-        System.out.println("CATEGORIA SCELTA: "+category);
+        if (category == null){
+            mainMenuStart();
+        }
+        System.out.println("Categoria scelta: "+category);
 
         //STEP 2: Form per l'annuncio
         Annuncio ann;
@@ -94,11 +146,12 @@ public class UserController implements Controller{
         String selectedCategory = "root";
         while (categoriePadreToFiglio.containsKey(selectedCategory)) {
             try {
-                String newCategory = UserView.selezioneCategoria(categoriePadreToFiglio.get(selectedCategory));
-                if (newCategory.equals("BACK")) {
+                List<String> childrenCategories = categoriePadreToFiglio.get(selectedCategory);
+                int chosenCategoryIndex = UserView.selezioneCategoria(childrenCategories);
+                if (chosenCategoryIndex == GO_BACK) {
                     selectedCategory = categorieFiglioToPadre.get(selectedCategory);
                 } else {
-                    selectedCategory = newCategory;
+                    selectedCategory = childrenCategories.get(chosenCategoryIndex);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

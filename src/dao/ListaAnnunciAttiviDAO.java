@@ -1,4 +1,38 @@
 package dao;
 
-public class ListaAnnunciAttiviDAO {
+import exception.DAOException;
+import factory.ConnectionFactory;
+import model.Annuncio;
+import model.Categoria;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListaAnnunciAttiviDAO implements GenericProcedureDAO<List<Annuncio>>{
+    @Override
+    public List<Annuncio> execute(Object... params) throws DAOException, SQLException {
+        List<Annuncio> annunci = new ArrayList<>();
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            CallableStatement cs = conn.prepareCall("{call listaAnnunciAttivi()}");
+            ResultSet rs = cs.executeQuery();
+            while (rs.next()) {
+                Annuncio ann = new Annuncio();
+                ann.setIdAnnuncio(rs.getInt("id_annuncio") );
+                ann.setUtente(rs.getString("utente"));
+                ann.setTitolo(rs.getString("titolo"));
+                ann.setDescrizione(rs.getString("descrizione"));
+                ann.setCategoria(rs.getString("categoria"));
+                ann.setDataPubblicazione(rs.getDate("data_pubblicazione"));
+                annunci.add(ann);
+            }
+        } catch(SQLException e) {
+            throw new DAOException("ListaAnnunciAttiviDAO error: " + e.getMessage());
+        }
+        return annunci;
+    }
 }

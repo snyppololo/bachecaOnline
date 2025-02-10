@@ -78,4 +78,20 @@ public class Annuncio {
     public Date getDataVendita() {
         return dataVendita;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        String dataVenditaString = this.dataVendita == null ? "---" : this.dataVendita.toString();
+        sb
+                .append("ID: ").append(idAnnuncio).append("\n")
+                .append("Venditore: ").append(utente).append("\n")
+                .append("Titolo: ").append(titolo).append("\n")
+                .append("Descrizione: ").append(descrizione).append("\n")
+                .append("Categoria: ").append(categoria).append("\n")
+                .append("Data pubblicazione: ").append(dataPubblicazione).append("\n")
+                .append("Data vendita: ").append(dataVenditaString);
+
+        return sb.toString();
+    }
 }
