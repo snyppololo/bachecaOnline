@@ -570,6 +570,51 @@ END$$
 
 DELIMITER ;
 
+-- -----------------------------------------------------
+-- procedure getChatUtente
+-- -----------------------------------------------------
+
+USE `bacheca_online`;
+DROP procedure IF EXISTS `bacheca_online`.`getChatUtente`;
+
+DELIMITER $$
+USE `bacheca_online`$$
+CREATE PROCEDURE `getChatUtente` (in var_utente VARCHAR(45))
+BEGIN
+	SELECT 
+        CASE 
+            WHEN M.mittente = var_utente THEN M.destinatario 
+            ELSE M.mittente 
+        END AS altro_utente,
+        M.annuncio, A.titolo,
+        MAX(M.ts_messaggio) AS ultima_attivita
+    FROM messaggio as M
+    JOIN annuncio as A on M.annuncio = A.id_annuncio
+    WHERE M.mittente = var_utente OR M.destinatario = var_utente
+    GROUP BY altro_utente, M.annuncio, A.titolo
+    ORDER BY ultima_attivita DESC;
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- procedure getMessaggiChat
+-- -----------------------------------------------------
+
+USE `bacheca_online`;
+DROP procedure IF EXISTS `bacheca_online`.`getMessaggiChat`;
+
+DELIMITER $$
+USE `bacheca_online`$$
+CREATE PROCEDURE `getMessaggiChat` (in var_mittente VARCHAR(45), in var_destinatario VARCHAR(45), in var_annuncio int)
+BEGIN
+	SELECT * FROM messaggio 
+    WHERE annuncio=var_annuncio AND ((mittente=var_mittente AND destinatario=var_destinatario) OR (mittente=var_destinatario AND destinatario=var_mittente))
+    ORDER BY ts_messaggio ASC;
+END$$
+
+DELIMITER ;
+
 USE `bacheca_online`;
 
 DELIMITER $$
@@ -630,6 +675,8 @@ GRANT EXECUTE ON procedure `bacheca_online`.`pubblicaCommento` TO 'ba_user';
 GRANT EXECUTE ON procedure `bacheca_online`.`getCategories` TO 'ba_user';
 GRANT EXECUTE ON procedure `bacheca_online`.`disattivaNotifichePerAnnuncio` TO 'ba_user';
 GRANT EXECUTE ON procedure `bacheca_online`.`checkNotificheOn` TO 'ba_user';
+GRANT EXECUTE ON procedure `bacheca_online`.`getChatUtente` TO 'ba_user';
+GRANT EXECUTE ON procedure `bacheca_online`.`getMessaggiChat` TO 'ba_user';
 
 SET SQL_MODE = '';
 DROP USER IF EXISTS ba_admin;

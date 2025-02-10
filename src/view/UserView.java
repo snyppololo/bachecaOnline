@@ -1,6 +1,8 @@
 package view;
 
 import model.Annuncio;
+import model.ChatPreview;
+import model.Messaggio;
 import utils.LoggedUser;
 
 import java.io.BufferedReader;
@@ -21,9 +23,10 @@ public class UserView {
         System.out.println("2) Visualizza annunci attivi");
         System.out.println("3) Visualizza annunci preferiti");
         System.out.println("4) Visualizza i tuoi annunci");
-        System.out.println("5) Logout");
+        System.out.println("5) Visualizza chat attive");
+        System.out.println("6) Logout");
 
-        return getAndValidateInput(5);
+        return getAndValidateInput(6);
     }
 
     public static Annuncio annuncioForm(String categoria) throws IOException {
@@ -79,6 +82,22 @@ public class UserView {
         }
     }
 
+    public static int showChatPreviews(List<ChatPreview> chatPreviews) throws IOException {
+        System.out.println("\n--- Le tue chat ---:");
+        System.out.println("Seleziona una chat per visualizzare i messaggi");
+        for (int i = 0; i < chatPreviews.size(); i++) {
+            ChatPreview ithCP = chatPreviews.get(i);
+            System.out.println(i+1+") Chat con: "+ithCP.getAltroUtente()+" - Annuncio: "+ithCP.getTitoloAnnuncio()+" - Ultima attività: "+ithCP.getUltimaAttivita());
+        }
+        printBackOption(chatPreviews.size()+1);
+        int choice = getAndValidateInput(chatPreviews.size()+1);
+        if (choice == chatPreviews.size()+1) {
+            return GO_BACK;
+        }else{
+            return choice-1;
+        }
+    }
+
     public static void showAnnuncioDetails(Annuncio annuncio) throws IOException {
         System.out.println(annuncio);
     }
@@ -88,12 +107,25 @@ public class UserView {
         System.out.println("\n1) Scrivi un messaggio privato al venditore");
         System.out.println("2) Pubblica un commento");
         System.out.println("3) "+onOrOff+" le notifiche per questo annuncio");
-        printBackOption(4);
-        return getAndValidateInput(4);
+        System.out.println("4) Visualizza commenti per questo annuncio");
+        printBackOption(5);
+        return getAndValidateInput(5);
     }
 
     public static int showMyAnnuncioOptions() throws IOException {
         System.out.println("\n1) Contrassegna annuncio come venduto");
+        System.out.println("2) Pubblica un commento");
+        System.out.println("3) Visualizza commenti per questo annuncio");
+        printBackOption(4);
+        return getAndValidateInput(4);
+    }
+
+    public static int showChatMessages(List<Messaggio> messaggi) throws IOException {
+        System.out.println("\n--- Chat ---");
+        for (Messaggio m : messaggi) {
+            System.out.println(m);
+        }
+        System.out.println("\n1) Invia messaggio");
         printBackOption(2);
         return getAndValidateInput(2);
     }

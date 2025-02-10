@@ -6,6 +6,8 @@ import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Annuncio;
 import model.Categoria;
+import model.ChatPreview;
+import model.Messaggio;
 import utils.Role;
 import view.UserView;
 
@@ -43,7 +45,8 @@ public class UserController implements Controller {
                     case 2 -> visualizzaAnnunciAttivi();
                     case 3 -> visualizzaAnnunciPreferiti();
                     case 4 -> visualizzaMieiAnnunci();
-                    case 5 -> {
+                    case 5 -> visualizzaChat();
+                    case 6 -> {
                         ConnectionFactory.closeConnection();
                         System.exit(0);
                     }
@@ -52,6 +55,46 @@ public class UserController implements Controller {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private void visualizzaChat() {
+        int chatIndex;
+        int choice;
+        try{
+            //Mostro all'utente la preview delle chat
+            List<ChatPreview> chatPreviews = new GetChatUtenteDAO().execute();
+            chatIndex = UserView.showChatPreviews(chatPreviews);
+
+            if (chatIndex == GO_BACK) {
+                mainMenuStart();
+            }
+
+            ChatPreview myChatPreview = chatPreviews.get(chatIndex);
+
+            //Mostro all'utente i messaggi della chat che ha scelto
+            try{
+                List<Messaggio> messaggi = new GetMessaggiChatDAO().execute(myChatPreview);
+                choice = UserView.showChatMessages(messaggi);
+
+                //1->invia messaggio, 2->torna alle chat preview
+                switch (choice) {
+                    case 1 -> inviaMessaggio();
+                    case 2 -> visualizzaChat();
+                }
+
+            } catch (DAOException | SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void inviaMessaggio() {
+        //TODO: fare Invia Messaggio, Pubblica Commento, Visualizza Commenti, controllare anche lato Admin registraUtente e aggiungiCategoria
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     //CASE 2 dello switch case
@@ -79,12 +122,17 @@ public class UserController implements Controller {
                 case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
                 case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
                 case 3 -> switchNotifiche(annunci.get(annuncioIndex), notificheOn);
-                case 4 -> visualizzaAnnunciAttivi();
+                case 4 -> visualizzaCommenti(annunci.get(annuncioIndex));
+                case 5 -> visualizzaAnnunciAttivi();
             }
 
         } catch (IOException | DAOException | SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void visualizzaCommenti(Annuncio annuncio) {
+
     }
 
     private void scriviMessaggio(Annuncio annuncio) {
@@ -127,7 +175,8 @@ public class UserController implements Controller {
                 case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
                 case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
                 case 3 -> switchNotifiche(annunci.get(annuncioIndex), true);
-                case 4 -> visualizzaAnnunciPreferiti();
+                case 4 -> visualizzaCommenti(annunci.get(annuncioIndex));
+                case 5 -> visualizzaAnnunciPreferiti();
             }
 
         } catch (IOException | DAOException | SQLException e) {
@@ -158,7 +207,9 @@ public class UserController implements Controller {
 
             switch (choice) {
                 case 1 -> contrassegnaAnnuncioVenduto(myAnnuncio);
-                case 2 -> visualizzaMieiAnnunci();
+                case 2 -> pubblicaCommento(myAnnuncio);
+                case 3 -> visualizzaCommenti(myAnnuncio);
+                case 4 -> visualizzaMieiAnnunci();
             }
 
         } catch (IOException | DAOException | SQLException e) {
