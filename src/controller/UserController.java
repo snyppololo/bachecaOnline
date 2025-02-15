@@ -75,7 +75,13 @@ public class UserController implements Controller {
 
                 //1->invia messaggio, 2->torna alle chat preview
                 switch (choice) {
-                    case 1 -> inviaMessaggio();
+                    case 1 -> {
+                        Annuncio annuncio = new Annuncio();
+                        annuncio.setIdAnnuncio(myChatPreview.getIdAnnuncio());
+                        annuncio.setTitolo(myChatPreview.getTitoloAnnuncio());
+                        annuncio.setUtente(myChatPreview.getAltroUtente());
+                        inviaMessaggio(annuncio);
+                    }
                     case 2 -> visualizzaChat();
                 }
 
@@ -89,9 +95,19 @@ public class UserController implements Controller {
         }
     }
 
-    private void inviaMessaggio() {
-        //TODO: fare Invia Messaggio, Pubblica Commento, Visualizza Commenti, controllare anche lato Admin registraUtente e aggiungiCategoria
-        throw new UnsupportedOperationException("Not supported yet.");
+    private void inviaMessaggio(Annuncio ann) {
+
+        try{
+            Messaggio messaggio = UserView.messaggioForm(ann);
+            System.out.println(new InviaMessaggioDAO().execute(messaggio));
+        }catch (DAOException | SQLException | IOException e){
+            e.printStackTrace();
+        }
+
+        //TODO: fare Invia Messaggio, controllare anche lato Admin registraUtente e aggiungiCategoria
+
+
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     //CASE 2 dello switch case
@@ -145,7 +161,7 @@ public class UserController implements Controller {
             choice = UserView.showAnnuncioOptions(notificheOn);
 
             switch (choice) {
-                case 1 -> scriviMessaggio(ann);
+                case 1 -> inviaMessaggio(ann);
                 case 2 -> pubblicaCommento(ann);
                 case 3 -> switchNotifiche(ann, notificheOn);
                 case 4 -> visualizzaCommenti(ann);
@@ -156,11 +172,6 @@ public class UserController implements Controller {
         }
 
 
-    }
-
-
-    private void scriviMessaggio(Annuncio annuncio) {
-        throw new RuntimeException();
     }
 
     private void pubblicaCommento(Annuncio annuncio) {
@@ -202,7 +213,7 @@ public class UserController implements Controller {
             choice = UserView.showAnnuncioOptions(true);
 
             switch (choice) {
-                case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
+                case 1 -> inviaMessaggio(annunci.get(annuncioIndex));
                 case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
                 case 3 -> switchNotifiche(annunci.get(annuncioIndex), true);
                 case 4 -> visualizzaCommenti(annunci.get(annuncioIndex));

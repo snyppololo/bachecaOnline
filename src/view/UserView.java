@@ -62,6 +62,20 @@ public class UserView {
         return comm;
     }
 
+    public static Messaggio messaggioForm(Annuncio ann) throws IOException {
+        Messaggio mess = new Messaggio();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("\nScrivi un messaggio all'utente "+ann.getUtente()+" per l'annuncio \"" + ann.getTitolo() + "\"");
+        System.out.print("Testo: ");
+        String text = reader.readLine();
+
+        mess.setMittente(LoggedUser.getUsername());
+        mess.setDestinatario(ann.getUtente());
+        mess.setIdAnnuncio(ann.getIdAnnuncio());
+        mess.setTesto(text);
+        return mess;
+    }
+
     public static int selezioneCategoria(List<String> categorie) throws IOException {
 
         System.out.println("\nSeleziona una categoria:");
@@ -153,7 +167,6 @@ public class UserView {
         printBackOption(2);
         return getAndValidateInput(2);
     }
-
 
     private static int getAndValidateInput(int maxNumber) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
