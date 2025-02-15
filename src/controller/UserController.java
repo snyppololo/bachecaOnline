@@ -4,10 +4,7 @@ import dao.*;
 import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
-import model.Annuncio;
-import model.Categoria;
-import model.ChatPreview;
-import model.Messaggio;
+import model.*;
 import utils.Role;
 import view.UserView;
 
@@ -60,7 +57,7 @@ public class UserController implements Controller {
     private void visualizzaChat() {
         int chatIndex;
         int choice;
-        try{
+        try {
             //Mostro all'utente la preview delle chat
             List<ChatPreview> chatPreviews = new GetChatUtenteDAO().execute();
             chatIndex = UserView.showChatPreviews(chatPreviews);
@@ -72,7 +69,7 @@ public class UserController implements Controller {
             ChatPreview myChatPreview = chatPreviews.get(chatIndex);
 
             //Mostro all'utente i messaggi della chat che ha scelto
-            try{
+            try {
                 List<Messaggio> messaggi = new GetMessaggiChatDAO().execute(myChatPreview);
                 choice = UserView.showChatMessages(messaggi);
 
@@ -99,8 +96,6 @@ public class UserController implements Controller {
 
     //CASE 2 dello switch case
     private void visualizzaAnnunciAttivi() {
-        //throw new UnsupportedOperationException("Not supported yet.");
-        int choice;
         int annuncioIndex;
         try {
             //Mostro inizialmente all'utente solo i titoli degli annunci attivi
@@ -111,20 +106,7 @@ public class UserController implements Controller {
                 mainMenuStart();
             }
 
-            //Ora mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
-            UserView.showAnnuncioDetails(annunci.get(annuncioIndex));
-
-            //Prima di mostrare le scelte devo controllare se l'utente ha gia' le notifiche attive per l'annuncio (Opzione attiva/disattiva notifiche)
-            boolean notificheOn = new CheckNotificheOnDAO().execute(annunci.get(annuncioIndex));
-            choice = UserView.showAnnuncioOptions(notificheOn);
-
-            switch (choice) {
-                case 1 -> scriviMessaggio(annunci.get(annuncioIndex));
-                case 2 -> pubblicaCommento(annunci.get(annuncioIndex));
-                case 3 -> switchNotifiche(annunci.get(annuncioIndex), notificheOn);
-                case 4 -> visualizzaCommenti(annunci.get(annuncioIndex));
-                case 5 -> visualizzaAnnunciAttivi();
-            }
+            visualizzaDettagliAndOpzioniAnnuncio(annunci.get(annuncioIndex));
 
         } catch (IOException | DAOException | SQLException e) {
             throw new RuntimeException(e);
@@ -132,8 +114,50 @@ public class UserController implements Controller {
     }
 
     private void visualizzaCommenti(Annuncio annuncio) {
+        int choice;
+        //Mostro all'utente i messaggi della chat che ha scelto
+        try {
+            List<Commento> commenti = new GetCommentiAnnuncioDAO().execute(annuncio);
+            choice = UserView.showComments(commenti);
+
+            //1->invia messaggio, 2->torna alle chat preview
+            switch (choice) {
+                case 1 -> pubblicaCommento(annuncio);
+                case 2 -> visualizzaDettagliAndOpzioniAnnuncio(annuncio);
+            }
+
+        } catch (DAOException | SQLException | IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
+
+    private void visualizzaDettagliAndOpzioniAnnuncio(Annuncio ann){
+        int choice;
+        boolean notificheOn;
+        try{
+
+            //Mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
+            UserView.showAnnuncioDetails(ann);
+
+            //Prima di mostrare le scelte devo controllare se l'utente ha gia' le notifiche attive per l'annuncio (Opzione attiva/disattiva notifiche)
+            notificheOn = new CheckNotificheOnDAO().execute(ann);
+            choice = UserView.showAnnuncioOptions(notificheOn);
+
+            switch (choice) {
+                case 1 -> scriviMessaggio(ann);
+                case 2 -> pubblicaCommento(ann);
+                case 3 -> switchNotifiche(ann, notificheOn);
+                case 4 -> visualizzaCommenti(ann);
+                case 5 -> visualizzaAnnunciAttivi();
+            }
+        }catch (DAOException | SQLException | IOException e){
+            e.printStackTrace();
+        }
+
+
+    }
+
 
     private void scriviMessaggio(Annuncio annuncio) {
         throw new RuntimeException();
@@ -220,7 +244,7 @@ public class UserController implements Controller {
     private void contrassegnaAnnuncioVenduto(Annuncio myAnnuncio) {
         try {
             System.out.println(new AnnuncioVendutoDAO().execute(myAnnuncio));
-        } catch (AnnuncioGiaVendutoException e){
+        } catch (AnnuncioGiaVendutoException e) {
             System.out.println(e.getMessage());
         }
     }

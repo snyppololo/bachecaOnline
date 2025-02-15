@@ -2,6 +2,7 @@ package view;
 
 import model.Annuncio;
 import model.ChatPreview;
+import model.Commento;
 import model.Messaggio;
 import utils.LoggedUser;
 
@@ -126,6 +127,16 @@ public class UserView {
             System.out.println(m);
         }
         System.out.println("\n1) Invia messaggio");
+        printBackOption(2);
+        return getAndValidateInput(2);
+    }
+
+    public static int showComments(List<Commento> commenti) throws IOException {
+        System.out.println("\n--- Commenti ---");
+        for (Commento c : commenti) {
+            System.out.println(c);
+        }
+        System.out.println("\n1) Pubblica un commento");
         printBackOption(2);
         return getAndValidateInput(2);
     }
