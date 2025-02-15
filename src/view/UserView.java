@@ -49,6 +49,19 @@ public class UserView {
         return ann;
     }
 
+    public static Commento commentoForm(Annuncio annuncio) throws IOException {
+        Commento comm = new Commento();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("\nScrivi un commento per l'annuncio \"" + annuncio.getTitolo() + "\"");
+        System.out.print("Testo: ");
+        String text = reader.readLine();
+
+        comm.setUtente(LoggedUser.getUsername());
+        comm.setIdAnnuncio(annuncio.getIdAnnuncio());
+        comm.setTesto(text);
+        return comm;
+    }
+
     public static int selezioneCategoria(List<String> categorie) throws IOException {
 
         System.out.println("\nSeleziona una categoria:");

@@ -1,5 +1,6 @@
 package dao;
 
+import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Annuncio;
 
@@ -9,16 +10,15 @@ import java.sql.SQLException;
 
 public class CreaAnnuncioDAO implements GenericProcedureDAO<String> {
     @Override
-    public String execute(Object... params){
+    public String execute(Object... params) throws DAOException {
         Annuncio annuncio = (Annuncio) params[0];
         try {
-            Connection conn = ConnectionFactory.getConnection();
             CallableStatement cs = getCallableStatement(annuncio);
             cs.execute();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException("CreaAnnuncio error: " + e.getMessage());
         }
-        return "Annuncio creato con successo";
+        return "Annuncio creato con successo!";
 
     }
 

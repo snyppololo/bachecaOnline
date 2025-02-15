@@ -164,7 +164,13 @@ public class UserController implements Controller {
     }
 
     private void pubblicaCommento(Annuncio annuncio) {
-        throw new RuntimeException();
+        try{
+            Commento commento = UserView.commentoForm(annuncio);
+            System.out.println(new PubblicaCommentoDAO().execute(commento));
+        }catch (DAOException | SQLException| IOException e){
+            e.printStackTrace();
+        }
+
     }
 
     private void switchNotifiche(Annuncio annuncio, boolean notificheAttive) {
