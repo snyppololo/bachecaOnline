@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-public class UserView {
+public class UserView extends CLIView {
 
     private static final int GO_BACK = -1;
 
@@ -96,9 +96,13 @@ public class UserView {
 
     public static int showTitoliAnnunci(List<Annuncio> annunci) throws IOException {
         System.out.println("\n--- Annunci attivi ---");
-        System.out.println("Seleziona un annuncio per visualizzarne le informazioni complete");
-        for (int i = 0; i < annunci.size(); i++) {
-            System.out.println(i+1+") "+annunci.get(i).getTitolo());
+        if (annunci.isEmpty()) {
+            System.out.println("Nessun annuncio trovato.");
+        }else{
+            System.out.println("Seleziona un annuncio per visualizzarne le informazioni complete");
+            for (int i = 0; i < annunci.size(); i++) {
+                System.out.println(i+1+") "+annunci.get(i).getTitolo());
+            }
         }
         printBackOption(annunci.size()+1);
         int choice = getAndValidateInput(annunci.size()+1);
@@ -168,22 +172,9 @@ public class UserView {
         return getAndValidateInput(2);
     }
 
-    private static int getAndValidateInput(int maxNumber) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        while (true) {
-            System.out.print("Seleziona un'opzione: ");
-            int choice = Integer.parseInt(reader.readLine());
-            if (choice >= 1 && choice <= maxNumber) {
-                return choice;
-            }else{
-                System.out.println("Opzione non valida");
-            }
-        }
-    }
 
-    private static void printBackOption(int optionNumber){
-        System.out.println(optionNumber+") Torna indietro");
-    }
+
+
 
 
 

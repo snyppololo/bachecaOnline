@@ -5,6 +5,7 @@ import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.*;
+import utils.LoggedUser;
 import utils.Role;
 import view.UserView;
 
@@ -29,10 +30,10 @@ public class UserController implements Controller {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        mainMenuStart();
+        userMainMenuStart();
     }
 
-    private void mainMenuStart() {
+    private void userMainMenuStart() {
         while (true) {
             int choice;
             try {
@@ -48,7 +49,7 @@ public class UserController implements Controller {
                         System.exit(0);
                     }
                 }
-            } catch (IOException | DAOException | SQLException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -63,7 +64,7 @@ public class UserController implements Controller {
             chatIndex = UserView.showChatPreviews(chatPreviews);
 
             if (chatIndex == GO_BACK) {
-                mainMenuStart();
+                userMainMenuStart();
             }
 
             ChatPreview myChatPreview = chatPreviews.get(chatIndex);
@@ -119,7 +120,7 @@ public class UserController implements Controller {
             annuncioIndex = UserView.showTitoliAnnunci(annunci);
 
             if (annuncioIndex == GO_BACK) {
-                mainMenuStart();
+                userMainMenuStart();
             }
 
             visualizzaDettagliAndOpzioniAnnuncio(annunci.get(annuncioIndex));
@@ -152,20 +153,31 @@ public class UserController implements Controller {
         int choice;
         boolean notificheOn;
         try{
-
             //Mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
             UserView.showAnnuncioDetails(ann);
 
-            //Prima di mostrare le scelte devo controllare se l'utente ha gia' le notifiche attive per l'annuncio (Opzione attiva/disattiva notifiche)
-            notificheOn = new CheckNotificheOnDAO().execute(ann);
-            choice = UserView.showAnnuncioOptions(notificheOn);
+            //Se sono il proprietario dell'annuncio devo visualizzare le opzioni "da proprietario"
+            if (LoggedUser.getUsername().equals(ann.getUtente())){
+                choice = UserView.showMyAnnuncioOptions();
+                switch (choice) {
+                    case 1 -> contrassegnaAnnuncioVenduto(ann);
+                    case 2 -> pubblicaCommento(ann);
+                    case 3 -> visualizzaCommenti(ann);
+                    case 4 -> visualizzaMieiAnnunci();
+                }
+            }else{
+                //Altrimenti visualizzo le opzioni per l'annuncio da utente esterno
+                //Prima di mostrare le scelte devo controllare se l'utente ha gia' le notifiche attive per l'annuncio (Opzione attiva/disattiva notifiche)
+                notificheOn = new CheckNotificheOnDAO().execute(ann);
+                choice = UserView.showAnnuncioOptions(notificheOn);
 
-            switch (choice) {
-                case 1 -> inviaMessaggio(ann);
-                case 2 -> pubblicaCommento(ann);
-                case 3 -> switchNotifiche(ann, notificheOn);
-                case 4 -> visualizzaCommenti(ann);
-                case 5 -> visualizzaAnnunciAttivi();
+                switch (choice) {
+                    case 1 -> inviaMessaggio(ann);
+                    case 2 -> pubblicaCommento(ann);
+                    case 3 -> switchNotifiche(ann, notificheOn);
+                    case 4 -> visualizzaCommenti(ann);
+                    case 5 -> visualizzaAnnunciAttivi();
+                }
             }
         }catch (DAOException | SQLException | IOException e){
             e.printStackTrace();
@@ -203,7 +215,7 @@ public class UserController implements Controller {
             annuncioIndex = UserView.showTitoliAnnunci(annunci);
 
             if (annuncioIndex == GO_BACK) {
-                mainMenuStart();
+                userMainMenuStart();
             }
 
             //Ora mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
@@ -235,7 +247,7 @@ public class UserController implements Controller {
             annuncioIndex = UserView.showTitoliAnnunci(annunci);
 
             if (annuncioIndex == GO_BACK) {
-                mainMenuStart();
+                userMainMenuStart();
             }
 
             Annuncio myAnnuncio = annunci.get(annuncioIndex);
@@ -267,11 +279,11 @@ public class UserController implements Controller {
     }
 
 
-    private void creaAnnuncio() throws DAOException, SQLException {
+    private void creaAnnuncio() {
         //STEP 1: Selezione categoria
         String category = selectCategory();
         if (category == null) {
-            mainMenuStart();
+            userMainMenuStart();
         }
         System.out.println("Categoria scelta: " + category);
 
@@ -284,7 +296,12 @@ public class UserController implements Controller {
         }
 
         //STEP 3: Esecuzione della procedura
-        System.out.println(new CreaAnnuncioDAO().execute(ann));
+        try{
+            System.out.println(new CreaAnnuncioDAO().execute(ann));
+        }catch (DAOException e){
+            e.printStackTrace();
+        }
+
     }
 
     private String selectCategory() {

@@ -157,7 +157,7 @@ DROP TABLE IF EXISTS `bacheca_online`.`metodo_di_contatto` ;
 CREATE TABLE IF NOT EXISTS `bacheca_online`.`metodo_di_contatto` (
   `MDC` VARCHAR(80) NOT NULL,
   `utente` VARCHAR(45) NOT NULL,
-  `tipo` ENUM('email', 'telefono', 'cellulare') NOT NULL,
+  `tipo` ENUM('Email', 'Telefono', 'Cellulare') NOT NULL,
   `preferenza` INT NOT NULL,
   PRIMARY KEY (`MDC`, `utente`),
   INDEX `fk_email_utente1_idx` (`utente` ASC) VISIBLE,
@@ -426,7 +426,7 @@ BEGIN
 		SELECT 
         SUBSTRING_INDEX(var_temp, ':', 1),
         SUBSTRING_INDEX(SUBSTRING_INDEX(var_temp, ':', 2), ':', -1),
-        CAST(SUBSTRING_INDEX(var_metodo, ':', -1) AS UNSIGNED)
+        CAST(SUBSTRING_INDEX(var_temp, ':', -1) AS UNSIGNED)
 		INTO var_tipo, var_contatto, var_preferenza;
         
         INSERT INTO metodo_di_contatto(MDC, utente, tipo, preferenza) VALUES (var_contatto, var_username, var_tipo, var_preferenza);
@@ -807,35 +807,35 @@ INSERT INTO login (user, password, ruolo) VALUES
 ('etagliabue', MD5('elena95top'), 'user'); -- password in chiaro: elena95top
 
 INSERT INTO metodo_di_contatto (MDC, utente, tipo, preferenza) VALUES
-('marco.rossi@email.com', 'mrossi', 'email', 1),
-('0298765432', 'mrossi', 'telefono', 0),
-('3391234567', 'mrossi', 'cellulare', 0),
+('marco.rossi@email.com', 'mrossi', 'Email', 1),
+('0298765432', 'mrossi', 'Telefono', 0),
+('3391234567', 'mrossi', 'Cellulare', 0),
 
-('laura.bianchi@email.com', 'lbianchi', 'email', 0),
-('0256789012', 'lbianchi', 'telefono', 1),
-('3487654321', 'lbianchi', 'cellulare', 0),
+('laura.bianchi@email.com', 'lbianchi', 'Email', 0),
+('0256789012', 'lbianchi', 'Telefono', 1),
+('3487654321', 'lbianchi', 'Cellulare', 0),
 
-('giuseppe.verdi@email.com', 'gverdi', 'email', 0),
-('0212345678', 'gverdi', 'telefono', 0),
-('3339876543', 'gverdi', 'cellulare', 1),
+('giuseppe.verdi@email.com', 'gverdi', 'Email', 0),
+('0212345678', 'gverdi', 'Telefono', 0),
+('3339876543', 'gverdi', 'Cellulare', 1),
 
-('andrea.seri@email.com', 'aseri', 'email', 1),
-('0245678901', 'aseri', 'telefono', 0),
+('andrea.seri@email.com', 'aseri', 'Email', 1),
+('0245678901', 'aseri', 'Telefono', 0),
 
-('martina.pagliani@email.com', 'mpagliani', 'email', 0),
-('0398765432', 'mpagliani', 'telefono', 0),
-('3401122334', 'mpagliani', 'cellulare', 1),
+('martina.pagliani@email.com', 'mpagliani', 'Email', 0),
+('0398765432', 'mpagliani', 'Telefono', 0),
+('3401122334', 'mpagliani', 'Cellulare', 1),
 
-('francesca.russo@email.com', 'frusso', 'email', 1),
-('0276543210', 'frusso', 'telefono', 0),
+('francesca.russo@email.com', 'frusso', 'Email', 1),
+('0276543210', 'frusso', 'Telefono', 0),
 
-('davide.capelli@email.com', 'dcapelli', 'email', 0),
-('0254321098', 'dcapelli', 'telefono', 1),
-('3332233445', 'dcapelli', 'cellulare', 0),
+('davide.capelli@email.com', 'dcapelli', 'Email', 0),
+('0254321098', 'dcapelli', 'Telefono', 1),
+('3332233445', 'dcapelli', 'Cellulare', 0),
 
-('elena.tagliabue@email.com', 'etagliabue', 'email', 0),
-('0223456789', 'etagliabue', 'telefono', 0),
-('3499988776', 'etagliabue', 'cellulare', 1);
+('elena.tagliabue@email.com', 'etagliabue', 'Email', 0),
+('0223456789', 'etagliabue', 'Telefono', 0),
+('3499988776', 'etagliabue', 'Cellulare', 1);
 
 INSERT INTO attiva_notifica (utente, annuncio) VALUES
 ('lbianchi', 1),  -- Laura Bianchi segue l'annuncio di Marco Rossi
@@ -905,6 +905,16 @@ CREATE FUNCTION `tokenizzaMetodiDiContatto` (var_lista_metodi TEXT, var_posizion
 RETURNS TEXT
 DETERMINISTIC
 BEGIN
+	 DECLARE var_num_token INT;
+    
+    -- Conta quanti token ci sono (numero di ';' + 1)
+    SET var_num_token = (LENGTH(var_lista_metodi) - LENGTH(REPLACE(var_lista_metodi, ';', ''))) + 1;
+
+    -- Se la posizione richiesta è maggiore del numero di token, restituisce stringa vuota
+    IF var_posizione > var_num_token THEN
+        RETURN '';
+    END IF;
+
     return substring_index(substring_index(var_lista_metodi, ';', var_posizione), ';', -1);
 END$$
 
