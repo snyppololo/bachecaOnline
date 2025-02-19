@@ -1,20 +1,29 @@
 package controller;
 
+import dao.AggiungiCategoriaDAO;
+import dao.GetCategoriesDAO;
 import dao.RegistraUtenteDAO;
-import dao.TestDAO;
+import dao.ReportAnnunciVendutiDAO;
 import exception.DAOException;
 import factory.ConnectionFactory;
+import model.Categoria;
 import model.MetodoDiContatto;
 import model.Utente;
 import utils.Role;
 import view.AdminView;
+import view.UserView;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class AdminController implements Controller {
+    //hashmap con chiave = Categoria padre - valore = lista categorie figlie
+    private static final Map<String, List<String>> categoriePadreToFiglio = new HashMap<>();
+    private static final Map<String, String> categorieFiglioToPadre = new HashMap<>();
+    private static final int GO_BACK = -1;
+    private static final int DONE = -2;
+
     @Override
     public void start() {
         try {
@@ -48,6 +57,12 @@ public class AdminController implements Controller {
     private void registraUtente() {
         Utente utente;
         List<MetodoDiContatto> metodiDiContatto;
+//        try{
+//            System.out.println(new TestDAO().execute());
+//        }catch (SQLException | DAOException e){
+//            e.printStackTrace();
+//        }
+
         try {
             //STEP 1: Form informazioni utente
             utente = AdminView.registraUtenteForm();
@@ -71,11 +86,94 @@ public class AdminController implements Controller {
     }
 
     private void aggiungiCategoria() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Categoria categoria = new Categoria();
+        String newCategoryName = null;
+        //STEP 1: Inserimento nome nuova categoria
+        try{
+            newCategoryName = AdminView.categoriaForm();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        //STEP 2: Selezionare la categoria padre della categoria che si vuole aggiungere, navigando tra le categorie
+        String parentCategoryName = null;
+        int confirmed = 0;
+        while(confirmed!=1){
+            try{
+                parentCategoryName = selectParentCategory();
+                if (parentCategoryName == null) {
+                    break;
+                }
+                confirmed = AdminView.confirmParentCategoryChoice(parentCategoryName);
+            }catch (IOException e){
+                throw new RuntimeException(e);
+            }
+        }
+
+        //Se l'utente ha selezionato "Torna indietro" torno al Main Menu
+        //Se l'utente ha selezionato come categoria padre "root" allora devo impostare parentCategory a NULL
+        if (parentCategoryName == null) {
+            adminMainMenuStart();
+        }else if (parentCategoryName.equals("root")){
+            parentCategoryName = null;
+            categoria.setNomeCat(newCategoryName);
+            categoria.setCatSup(parentCategoryName);
+        }else{
+            categoria.setNomeCat(newCategoryName);
+            categoria.setCatSup(parentCategoryName);
+        }
+
+        //STEP 3: Eseguo la procedura
+        try{
+            System.out.println(new AggiungiCategoriaDAO().execute(categoria));
+        }catch (DAOException e){
+            e.printStackTrace();
+        }
+
     }
 
     private void generaReportAnnuale() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try{
+            System.out.println(new ReportAnnunciVendutiDAO().execute());
+        }catch (DAOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private String selectParentCategory() {
+        List<Categoria> categories;
+        try {
+            categories = new GetCategoriesDAO().execute();
+        } catch (DAOException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+        cacheCategories(categories);
+        String selectedCategory = "root";
+        while (categoriePadreToFiglio.containsKey(selectedCategory)) {
+            try {
+                List<String> childrenCategories = categoriePadreToFiglio.get(selectedCategory);
+                int chosenCategoryIndex = AdminView.selezioneCategoriaGenitore(childrenCategories);
+                if (chosenCategoryIndex == GO_BACK) {
+                    selectedCategory = categorieFiglioToPadre.get(selectedCategory);
+                } else if (chosenCategoryIndex == DONE){
+                    break;
+                }else {
+                    selectedCategory = childrenCategories.get(chosenCategoryIndex);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return selectedCategory;
+    }
+
+    private void cacheCategories(List<Categoria> categories) {
+        categoriePadreToFiglio.clear();
+        categorieFiglioToPadre.clear();
+        for (Categoria c : categories) {
+            categoriePadreToFiglio.computeIfAbsent(c.getCatSup(), k -> new ArrayList<>()).add(c.getNomeCat());
+            categorieFiglioToPadre.put(c.getNomeCat(), c.getCatSup());
+        }
     }
 
 

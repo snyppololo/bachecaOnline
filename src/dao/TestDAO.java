@@ -29,7 +29,7 @@ public class TestDAO implements GenericProcedureDAO<String>{
             stmt.setString(10, "Via Milano");
             stmt.setString(11, "20");
             stmt.setString(12, "20100");
-            stmt.setString(13, "Email:mario@gmail.com:1;Telefono:1234567890:0;Email:mario2@gmail.com:0");
+            stmt.setString(13, "Test:mario@gmail.com:1;Telefono:1234567890:0;Email:mario2@gmail.com:0");
 
             // Esegui la procedura
             boolean hasResults = stmt.execute();

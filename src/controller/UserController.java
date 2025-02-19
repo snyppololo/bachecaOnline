@@ -104,11 +104,6 @@ public class UserController implements Controller {
         }catch (DAOException | SQLException | IOException e){
             e.printStackTrace();
         }
-
-        //TODO: fare Invia Messaggio, controllare anche lato Admin registraUtente e aggiungiCategoria
-
-
-        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     //CASE 2 dello switch case
@@ -204,7 +199,6 @@ public class UserController implements Controller {
         }
     }
 
-
     //CASE 3 dello switch case
     private void visualizzaAnnunciPreferiti() {
         int choice;
@@ -277,7 +271,6 @@ public class UserController implements Controller {
             System.out.println(e.getMessage());
         }
     }
-
 
     private void creaAnnuncio() {
         //STEP 1: Selezione categoria
