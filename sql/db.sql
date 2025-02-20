@@ -694,6 +694,8 @@ SET SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DAT
 CREATE USER 'ba_login' IDENTIFIED BY 'ba_login';
 
 GRANT EXECUTE ON procedure `bacheca_online`.`login` TO 'ba_login';
+GRANT EXECUTE ON procedure `bacheca_online`.`registraUtente` TO 'ba_login';
+GRANT EXECUTE ON procedure `bacheca_online`.`inserisciMetodiDiContatto` TO 'ba_login';
 SET SQL_MODE = '';
 DROP USER IF EXISTS ba_user;
 SET SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -720,8 +722,6 @@ SET SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DAT
 CREATE USER 'ba_admin' IDENTIFIED BY 'ba_admin';
 
 GRANT EXECUTE ON procedure `bacheca_online`.`reportPercentualeAnnunciVendutiUtente` TO 'ba_admin';
-GRANT EXECUTE ON procedure `bacheca_online`.`registraUtente` TO 'ba_admin';
-GRANT EXECUTE ON procedure `bacheca_online`.`inserisciMetodiDiContatto` TO 'ba_admin';
 GRANT EXECUTE ON procedure `bacheca_online`.`aggiungiCategoria` TO 'ba_admin';
 GRANT EXECUTE ON procedure `bacheca_online`.`getCategories` TO 'ba_admin';
 

@@ -2,16 +2,12 @@ package controller;
 
 import dao.AggiungiCategoriaDAO;
 import dao.GetCategoriesDAO;
-import dao.RegistraUtenteDAO;
 import dao.ReportAnnunciVendutiDAO;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Categoria;
-import model.MetodoDiContatto;
-import model.Utente;
 import utils.Role;
 import view.AdminView;
-import view.UserView;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -40,10 +36,9 @@ public class AdminController implements Controller {
             try {
                 choice = AdminView.showMenu();
                 switch (choice) {
-                    case 1 -> registraUtente();
-                    case 2 -> aggiungiCategoria();
-                    case 3 -> generaReportAnnuale();
-                    case 4 -> {
+                    case 1 -> aggiungiCategoria();
+                    case 2 -> generaReportAnnuale();
+                    case 3 -> {
                         ConnectionFactory.closeConnection();
                         System.exit(0);
                     }
@@ -51,37 +46,6 @@ public class AdminController implements Controller {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-    }
-
-    private void registraUtente() {
-        Utente utente;
-        List<MetodoDiContatto> metodiDiContatto;
-//        try{
-//            System.out.println(new TestDAO().execute());
-//        }catch (SQLException | DAOException e){
-//            e.printStackTrace();
-//        }
-
-        try {
-            //STEP 1: Form informazioni utente
-            utente = AdminView.registraUtenteForm();
-
-            //STEP 2: Inserimento metodi di contatto
-            metodiDiContatto = AdminView.metodiDiContattoForm();
-
-            //STEP 3: Formattazione dei metodi di contatto nel formato "tipo:contatto:preferenza"
-            StringJoiner joiner = new StringJoiner(";");
-            for (MetodoDiContatto mdc : metodiDiContatto) {
-                joiner.add(mdc.toFormat());
-            }
-
-            String mdcFormatted = joiner.toString();
-            //STEP 4: Esecuzione della procedura
-            System.out.println(new RegistraUtenteDAO().execute(utente, mdcFormatted));
-
-        } catch (IOException | SQLException | DAOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -175,7 +139,5 @@ public class AdminController implements Controller {
             categorieFiglioToPadre.put(c.getNomeCat(), c.getCatSup());
         }
     }
-
-
 }
 
