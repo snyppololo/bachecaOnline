@@ -1,6 +1,5 @@
 package dao;
 
-import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
 
@@ -8,7 +7,7 @@ import java.sql.*;
 
 public class TestDAO implements GenericProcedureDAO<String>{
     @Override
-    public String execute(Object... params) throws DAOException, SQLException {
+    public String execute(Object... params) throws DAOException {
         CallableStatement stmt = null;
         ResultSet rs = null;
 

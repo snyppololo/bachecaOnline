@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class DisattivaNotificheDAO implements GenericProcedureDAO<String>{
     @Override
-    public String execute(Object... params){
+    public String execute(Object... params) throws DAOException {
         Annuncio annuncio = (Annuncio) params[0];
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -20,7 +20,7 @@ public class DisattivaNotificheDAO implements GenericProcedureDAO<String>{
             cs.setInt(2, annuncio.getIdAnnuncio());
             cs.execute();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException("DissattivaNotifiche error: "+e.getMessage());
         }
         return "Notifiche disattivate con successo";
     }

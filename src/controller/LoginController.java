@@ -67,7 +67,7 @@ public class LoginController implements Controller {
             //STEP 4: Esecuzione della procedura
             System.out.println(new RegistraUtenteDAO().execute(utente, mdcFormatted));
 
-        } catch (IOException | SQLException | DAOException e) {
+        } catch (IOException | DAOException e) {
             e.printStackTrace();
         }
     }

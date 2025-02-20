@@ -1,20 +1,7 @@
 package view;
 
-import model.MetodoDiContatto;
-import model.Utente;
-import utils.TipoDiContatto;
-import utils.TipoIndirizzo;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class AdminView extends CLIView {
 

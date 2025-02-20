@@ -108,7 +108,7 @@ public class AdminController implements Controller {
         List<Categoria> categories;
         try {
             categories = new GetCategoriesDAO().execute();
-        } catch (DAOException | SQLException e) {
+        } catch (DAOException e) {
             throw new RuntimeException(e);
         }
         cacheCategories(categories);

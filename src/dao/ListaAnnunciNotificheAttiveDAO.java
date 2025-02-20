@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ListaAnnunciNotificheAttiveDAO implements GenericProcedureDAO<List<Annuncio>>{
     @Override
-    public List<Annuncio> execute(Object... params) throws DAOException, SQLException {
+    public List<Annuncio> execute(Object... params) throws DAOException{
         List<Annuncio> annunci = new ArrayList<>();
         try {
             Connection conn = ConnectionFactory.getConnection();

@@ -1,9 +1,7 @@
 package dao;
 
-import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
-import model.Commento;
 import model.Messaggio;
 
 import java.sql.CallableStatement;
@@ -13,7 +11,7 @@ import java.sql.SQLException;
 public class InviaMessaggioDAO implements GenericProcedureDAO<String>{
 
     @Override
-    public String execute(Object... params) throws DAOException, SQLException {
+    public String execute(Object... params) throws DAOException {
         Messaggio mess = (Messaggio) params[0];
         try{
             Connection conn = ConnectionFactory.getConnection();
@@ -27,7 +25,6 @@ public class InviaMessaggioDAO implements GenericProcedureDAO<String>{
         }catch (SQLException e){
             throw new DAOException("InviaMessaggio error: "+ e.getMessage());
         }
-
         return "Messaggio inviato con successo!";
     }
 }

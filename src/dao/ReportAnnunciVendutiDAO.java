@@ -1,6 +1,5 @@
 package dao;
 
-import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
 

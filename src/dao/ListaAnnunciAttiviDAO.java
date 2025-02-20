@@ -3,7 +3,6 @@ package dao;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Annuncio;
-import model.Categoria;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public class ListaAnnunciAttiviDAO implements GenericProcedureDAO<List<Annuncio>>{
     @Override
-    public List<Annuncio> execute(Object... params) throws DAOException, SQLException {
+    public List<Annuncio> execute(Object... params) throws DAOException {
         List<Annuncio> annunci = new ArrayList<>();
         try {
             Connection conn = ConnectionFactory.getConnection();

@@ -9,7 +9,7 @@ import java.sql.*;
 
 public class CheckNotificheOnDAO implements GenericProcedureDAO<Boolean> {
     @Override
-    public Boolean execute(Object... params) throws DAOException, SQLException {
+    public Boolean execute(Object... params) throws DAOException {
         Annuncio ann = (Annuncio) params[0];
         boolean output = false;
         try {
@@ -22,7 +22,7 @@ public class CheckNotificheOnDAO implements GenericProcedureDAO<Boolean> {
 
             output = cs.getBoolean(3);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException("CheckNotifiche error: " + e.getMessage());
         }
         return output;
     }

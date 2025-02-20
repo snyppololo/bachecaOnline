@@ -3,11 +3,7 @@ package dao;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.Annuncio;
-import model.ChatPreview;
 import model.Commento;
-import model.Messaggio;
-import utils.LoggedUser;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,7 +13,7 @@ import java.util.List;
 
 public class GetCommentiAnnuncioDAO implements GenericProcedureDAO<List<Commento>> {
     @Override
-    public List<Commento> execute(Object... params) throws DAOException, SQLException {
+    public List<Commento> execute(Object... params) throws DAOException {
         Annuncio ann = (Annuncio) params[0];
         List<Commento> commenti = new ArrayList<Commento>();
         try{
@@ -36,7 +32,7 @@ public class GetCommentiAnnuncioDAO implements GenericProcedureDAO<List<Commento
                 commenti.add(c);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException("GetCommentiAnnuncio error: " + e.getMessage());
         }
         return commenti;
     }

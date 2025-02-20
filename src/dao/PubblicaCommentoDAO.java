@@ -1,9 +1,7 @@
 package dao;
 
-import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
-import model.Annuncio;
 import model.Commento;
 import utils.LoggedUser;
 
@@ -13,7 +11,7 @@ import java.sql.SQLException;
 
 public class PubblicaCommentoDAO implements GenericProcedureDAO<String> {
     @Override
-    public String execute(Object... params) throws DAOException, SQLException {
+    public String execute(Object... params) throws DAOException {
         Commento commento = (Commento) params[0];
         try {
             Connection conn = ConnectionFactory.getConnection();

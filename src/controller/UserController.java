@@ -70,38 +70,30 @@ public class UserController implements Controller {
             ChatPreview myChatPreview = chatPreviews.get(chatIndex);
 
             //Mostro all'utente i messaggi della chat che ha scelto
-            try {
-                List<Messaggio> messaggi = new GetMessaggiChatDAO().execute(myChatPreview);
-                choice = UserView.showChatMessages(messaggi);
+            List<Messaggio> messaggi = new GetMessaggiChatDAO().execute(myChatPreview);
+            choice = UserView.showChatMessages(messaggi);
 
-                //1->invia messaggio, 2->torna alle chat preview
-                switch (choice) {
-                    case 1 -> {
-                        Annuncio annuncio = new Annuncio();
-                        annuncio.setIdAnnuncio(myChatPreview.getIdAnnuncio());
-                        annuncio.setTitolo(myChatPreview.getTitoloAnnuncio());
-                        annuncio.setUtente(myChatPreview.getAltroUtente());
-                        inviaMessaggio(annuncio);
-                    }
-                    case 2 -> visualizzaChat();
+            //1->invia messaggio, 2->torna alle chat preview
+            switch (choice) {
+                case 1 -> {
+                    Annuncio annuncio = new Annuncio();
+                    annuncio.setIdAnnuncio(myChatPreview.getIdAnnuncio());
+                    annuncio.setTitolo(myChatPreview.getTitoloAnnuncio());
+                    annuncio.setUtente(myChatPreview.getAltroUtente());
+                    inviaMessaggio(annuncio);
                 }
-
-            } catch (DAOException | SQLException e) {
-                throw new RuntimeException(e);
+                case 2 -> visualizzaChat();
             }
-
-
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | DAOException e) {
+            e.printStackTrace();
         }
     }
 
     private void inviaMessaggio(Annuncio ann) {
-
-        try{
+        try {
             Messaggio messaggio = UserView.messaggioForm(ann);
             System.out.println(new InviaMessaggioDAO().execute(messaggio));
-        }catch (DAOException | SQLException | IOException e){
+        } catch (DAOException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -120,7 +112,7 @@ public class UserController implements Controller {
 
             visualizzaDettagliAndOpzioniAnnuncio(annunci.get(annuncioIndex));
 
-        } catch (IOException | DAOException | SQLException e) {
+        } catch (IOException | DAOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -138,21 +130,21 @@ public class UserController implements Controller {
                 case 2 -> visualizzaDettagliAndOpzioniAnnuncio(annuncio);
             }
 
-        } catch (DAOException | SQLException | IOException e) {
+        } catch (DAOException | IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    private void visualizzaDettagliAndOpzioniAnnuncio(Annuncio ann){
+    private void visualizzaDettagliAndOpzioniAnnuncio(Annuncio ann) {
         int choice;
         boolean notificheOn;
-        try{
+        try {
             //Mostro all'utente le informazioni relative all'annuncio specifico che ha selezionato
             UserView.showAnnuncioDetails(ann);
 
             //Se sono il proprietario dell'annuncio devo visualizzare le opzioni "da proprietario"
-            if (LoggedUser.getUsername().equals(ann.getUtente())){
+            if (LoggedUser.getUsername().equals(ann.getUtente())) {
                 choice = UserView.showMyAnnuncioOptions();
                 switch (choice) {
                     case 1 -> contrassegnaAnnuncioVenduto(ann);
@@ -160,7 +152,7 @@ public class UserController implements Controller {
                     case 3 -> visualizzaCommenti(ann);
                     case 4 -> visualizzaMieiAnnunci();
                 }
-            }else{
+            } else {
                 //Altrimenti visualizzo le opzioni per l'annuncio da utente esterno
                 //Prima di mostrare le scelte devo controllare se l'utente ha gia' le notifiche attive per l'annuncio (Opzione attiva/disattiva notifiche)
                 notificheOn = new CheckNotificheOnDAO().execute(ann);
@@ -174,7 +166,7 @@ public class UserController implements Controller {
                     case 5 -> visualizzaAnnunciAttivi();
                 }
             }
-        }catch (DAOException | SQLException | IOException e){
+        } catch (DAOException | IOException e) {
             e.printStackTrace();
         }
 
@@ -182,21 +174,26 @@ public class UserController implements Controller {
     }
 
     private void pubblicaCommento(Annuncio annuncio) {
-        try{
+        try {
             Commento commento = UserView.commentoForm(annuncio);
             System.out.println(new PubblicaCommentoDAO().execute(commento));
-        }catch (DAOException | SQLException| IOException e){
+        } catch (DAOException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
     private void switchNotifiche(Annuncio annuncio, boolean notificheAttive) {
-        if (notificheAttive) {
-            System.out.println(new DisattivaNotificheDAO().execute(annuncio));
-        } else {
-            System.out.println(new AttivaNotificheDAO().execute(annuncio));
+        try {
+            if (notificheAttive) {
+                System.out.println(new DisattivaNotificheDAO().execute(annuncio));
+            } else {
+                System.out.println(new AttivaNotificheDAO().execute(annuncio));
+            }
+        } catch (DAOException e) {
+            e.printStackTrace();
         }
+
     }
 
     //CASE 3 dello switch case
@@ -226,7 +223,7 @@ public class UserController implements Controller {
                 case 5 -> visualizzaAnnunciPreferiti();
             }
 
-        } catch (IOException | DAOException | SQLException e) {
+        } catch (IOException | DAOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -259,7 +256,7 @@ public class UserController implements Controller {
                 case 4 -> visualizzaMieiAnnunci();
             }
 
-        } catch (IOException | DAOException | SQLException e) {
+        } catch (IOException | DAOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -289,9 +286,9 @@ public class UserController implements Controller {
         }
 
         //STEP 3: Esecuzione della procedura
-        try{
+        try {
             System.out.println(new CreaAnnuncioDAO().execute(ann));
-        }catch (DAOException e){
+        } catch (DAOException e) {
             e.printStackTrace();
         }
 
@@ -301,7 +298,7 @@ public class UserController implements Controller {
         List<Categoria> categories;
         try {
             categories = new GetCategoriesDAO().execute();
-        } catch (DAOException | SQLException e) {
+        } catch (DAOException e) {
             throw new RuntimeException(e);
         }
         cacheCategories(categories);
@@ -329,14 +326,6 @@ public class UserController implements Controller {
             categoriePadreToFiglio.computeIfAbsent(c.getCatSup(), k -> new ArrayList<>()).add(c.getNomeCat());
             categorieFiglioToPadre.put(c.getNomeCat(), c.getCatSup());
         }
-    }
-
-    private List<String> getChildCategories(String catSup) {
-        return categoriePadreToFiglio.get(catSup);
-    }
-
-    private String getParentCategory(String catFiglio) {
-        return categorieFiglioToPadre.get(catFiglio);
     }
 
 }

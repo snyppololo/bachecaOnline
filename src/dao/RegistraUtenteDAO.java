@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 public class RegistraUtenteDAO implements GenericProcedureDAO<String>{
     @Override
-    public String execute(Object... params) throws DAOException, SQLException {
+    public String execute(Object... params) throws DAOException {
         Utente utente = (Utente) params[0];
         String metodiDiContattoFormatted = (String) params[1];
         try {

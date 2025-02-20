@@ -803,7 +803,7 @@ INSERT INTO login (user, password, ruolo) VALUES
 ('aseri', MD5('andrea92!'), 'user'),       -- password in chiaro: andrea92!
 ('mpagliani', MD5('martina88'), 'user'),  -- password in chiaro: martina88
 ('frusso', MD5('francesca91'), 'user'),    -- password in chiaro: francesca91
-('dcapelli', MD5('davidex79'), 'user'),    -- password in chiaro: davidx79
+('dcapelli', MD5('davidex79'), 'user'),    -- password in chiaro: davidex79
 ('etagliabue', MD5('elena95top'), 'user'); -- password in chiaro: elena95top
 
 INSERT INTO metodo_di_contatto (MDC, utente, tipo, preferenza) VALUES

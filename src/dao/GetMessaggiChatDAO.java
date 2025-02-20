@@ -1,6 +1,5 @@
 package dao;
 
-import exception.AnnuncioGiaVendutoException;
 import exception.DAOException;
 import factory.ConnectionFactory;
 import model.ChatPreview;
@@ -16,7 +15,7 @@ import java.util.List;
 
 public class GetMessaggiChatDAO implements GenericProcedureDAO<List<Messaggio>> {
     @Override
-    public List<Messaggio> execute(Object... params) throws DAOException, SQLException {
+    public List<Messaggio> execute(Object... params) throws DAOException {
         ChatPreview cp = (ChatPreview) params[0];
         List<Messaggio> messaggi = new ArrayList<Messaggio>();
         try{
@@ -38,7 +37,7 @@ public class GetMessaggiChatDAO implements GenericProcedureDAO<List<Messaggio>> 
                 messaggi.add(m);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DAOException("GetMessaggiChat error: " + e.getMessage());
         }
         return messaggi;
     }

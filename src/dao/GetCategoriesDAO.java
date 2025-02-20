@@ -10,7 +10,7 @@ import java.util.List;
 
 public class GetCategoriesDAO implements GenericProcedureDAO<List<Categoria>> {
     @Override
-    public List<Categoria> execute(Object... params) throws DAOException, SQLException {
+    public List<Categoria> execute(Object... params) throws DAOException {
         List<Categoria> categories = new ArrayList<>();
         try {
             Connection conn = ConnectionFactory.getConnection();
