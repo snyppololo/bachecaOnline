@@ -15,7 +15,7 @@ public class GetCommentiAnnuncioDAO implements GenericProcedureDAO<List<Commento
     @Override
     public List<Commento> execute(Object... params) throws DAOException {
         Annuncio ann = (Annuncio) params[0];
-        List<Commento> commenti = new ArrayList<Commento>();
+        List<Commento> commenti = new ArrayList<>();
         try{
             Connection conn = ConnectionFactory.getConnection();
             CallableStatement cs = conn.prepareCall("{call getCommentiAnnuncio(?)}");

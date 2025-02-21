@@ -114,6 +114,8 @@ public class LoginView extends CLIView {
     }
 
     public static List<MetodoDiContatto> metodiDiContattoForm() throws IOException {
+        boolean askPreferito = true;
+        int preferenza = 0;
         List<MetodoDiContatto> mdcs = new ArrayList<>();
         System.out.println("\nInserisci i metodi di contatto dell'utente");
         boolean continueFlag = true;
@@ -124,11 +126,20 @@ public class LoginView extends CLIView {
             mdc.setTipoContatto(tipo);
             String contatto = getNotEmptyInput("Inserire il contatto: ");
             mdc.setContatto(contatto);
-            int preferenza = setPreferenza();
+            //Questo blocco if serve a chiedere all'utente di impostare un metodo di contatto come preferito
+            //solo se non lo ha ancora fatto
+            if (askPreferito){
+                preferenza = setPreferenza();
+                if (preferenza == 1) {
+                    askPreferito = false;
+                }
+            }
             mdc.setPreferenza(preferenza);
+            //Resetto il valore di preferenza a 0 cosi' che se l'utente ha impostato un metodo come preferito i prossimi
+            //saranno automaticamente non preferiti
+            preferenza = 0;
             mdcs.add(mdc);
             continueFlag = askUserMoreMetodiDiContatto();
-
         }
         return mdcs;
     }

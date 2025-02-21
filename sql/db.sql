@@ -240,24 +240,15 @@ DELIMITER $$
 USE `bacheca_online`$$
 CREATE PROCEDURE `contrassegnaAnnuncioVenduto` (in var_annuncio INT, in var_data_vendita DATE)
 BEGIN
-	DECLARE var_check_vendita DATE;
+	UPDATE annuncio 
+    SET data_vendita = var_data_vendita 
+    WHERE id_annuncio = var_annuncio AND data_vendita IS NULL;
     
-    DECLARE exit handler for sqlexception
-    begin
-		rollback;
-        resignal;
-	end;
-    
-    set transaction isolation level repeatable read;
-    
-    start transaction;
-    SELECT data_vendita FROM annuncio WHERE id_annuncio = var_annuncio INTO var_check_vendita;
-    if var_check_vendita IS NOT NULL THEN
-		signal sqlstate '45000' set message_text = "L'annuncio risulta già contrassegnato come venduto";
-	end if;
-    
-    UPDATE annuncio SET data_vendita = var_data_vendita WHERE id_annuncio = var_annuncio AND data_vendita IS NULL;
-    commit;
+	-- Se row_count = 0 significa che non e' stata modificata nessuna riga -> L'annuncio era gia' segnato come venduto o non esisteva
+    IF ROW_COUNT() = 0 THEN 
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'L''annuncio risulta già contrassegnato come venduto o non esiste';
+    END IF;
 END$$
 
 DELIMITER ;
@@ -401,7 +392,7 @@ DROP procedure IF EXISTS `bacheca_online`.`inserisciMetodiDiContatto`;
 
 DELIMITER $$
 USE `bacheca_online`$$
-CREATE PROCEDURE `inserisciMetodiDiContatto` (in var_username VARCHAR(45), in var_metodi_di_contatto TEXT, out var_num_contatti_inseriti INT)
+CREATE PROCEDURE `inserisciMetodiDiContatto` (in var_username VARCHAR(45), in var_metodi_di_contatto TEXT, out var_num_contatti_inseriti INT, out var_num_preferiti INT)
 BEGIN
 	
 	DECLARE var_temp TEXT;
@@ -409,18 +400,18 @@ BEGIN
     DECLARE var_tipo VARCHAR(50);
     DECLARE var_contatto VARCHAR(80);
     DECLARE var_preferenza INT;
-    DECLARE var_num_contatti_inseriti INT;
     SET var_num_contatti_inseriti = 0;
+    SET var_num_preferiti = 0;
 	-- separo metodi di contatto col ; (for loop)
     -- per ogni metodo di contatto estraggo le parti che mi interessano
-    set var_i = 1;
+    SET var_i = 1;
     
     insert_metodi_di_contatto: loop
-        set var_temp = tokenizzaMetodiDiContatto(var_metodi_di_contatto, var_i);
-        if var_temp = ''
-        then
-            leave insert_metodi_di_contatto;
-        end if;
+        SET var_temp = tokenizzaMetodiDiContatto(var_metodi_di_contatto, var_i);
+        IF var_temp = ''
+        THEN
+            LEAVE insert_metodi_di_contatto;
+        END IF;
         
         -- Estrarre i valori separati da ':'
 		SELECT 
@@ -430,9 +421,14 @@ BEGIN
 		INTO var_tipo, var_contatto, var_preferenza;
         
         INSERT INTO metodo_di_contatto(MDC, utente, tipo, preferenza) VALUES (var_contatto, var_username, var_tipo, var_preferenza);
-        set var_num_contatti_inseriti = var_num_contatti_inseriti+1;
-        set var_i = var_i+1;
-    end loop;
+        SET var_num_contatti_inseriti = var_num_contatti_inseriti+1;
+        
+        IF var_preferenza = 1
+        THEN SET var_num_preferiti = var_num_preferiti+1;
+        END IF;
+        
+        SET var_i = var_i+1;
+    END LOOP;
     
 END$$
 
@@ -451,6 +447,7 @@ CREATE PROCEDURE `registraUtente` (in var_username varchar(45), in var_password 
 BEGIN
 	
     DECLARE var_num_contatti_inseriti INT;
+    DECLARE var_num_preferiti INT;
 	DECLARE exit handler for sqlexception
     
     begin
@@ -463,10 +460,15 @@ BEGIN
     
     INSERT INTO utente (username, cf, nome, cognome, data_nascita, r_via, r_civico, r_cap, f_via, f_civico, f_cap) VALUES (var_username, var_cf, var_nome, var_cognome, var_data_nascita, var_r_via, var_r_civico, var_r_cap, var_f_via, var_f_civico, var_f_cap);
     INSERT INTO login (user, password, ruolo) VALUES (var_username, MD5(var_password), 'user');
-    call inserisciMetodiDiContatto(var_username, var_metodi_di_contatto, var_num_contatti_inseriti);
+    call inserisciMetodiDiContatto(var_username, var_metodi_di_contatto, var_num_contatti_inseriti, var_num_preferiti);
     if var_num_contatti_inseriti <= 0 then
         signal sqlstate '45000' set message_text = "L'utente deve fornire almeno un recapito";
     end if;
+    
+    IF var_num_preferiti <> 1 THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "L'utente deve selezionare esattamente un metodo di contatto come preferito";
+	END IF;
+    
     commit;
 END$$
 
