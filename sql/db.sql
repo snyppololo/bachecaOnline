@@ -465,6 +465,7 @@ BEGIN
         signal sqlstate '45000' set message_text = "L'utente deve fornire almeno un recapito";
     end if;
     
+    -- Eseguo il controllo qui e non in un trigger apposito in modo da effettuarlo una volta sola, invece che per ogni inserimento.
     IF var_num_preferiti <> 1 THEN
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = "L'utente deve selezionare esattamente un metodo di contatto come preferito";
 	END IF;
